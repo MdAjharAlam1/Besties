@@ -5,18 +5,29 @@ import mongoose from 'mongoose'
 mongoose.connect(process.env.DB!)
 
 import express from 'express'
+import { createServer } from 'http'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import { Server } from 'socket.io'
+import CorsConfig from './utils/cors'
+import StatusSocket from './socket/status.socket'
+
 
 const app = express()
-app.listen(process.env.PORT || 8080,()=>{
+const server = createServer(app)
+
+server.listen(process.env.PORT || 8080,()=>{
     console.log(`Server running on ${process.env.PORT}`)
 })
 
-app.use(cors({
-    origin : process.env.CLIENT,
-    credentials:true
-}))
+//socket connection
+const io = new Server(server, {cors : CorsConfig})
+StatusSocket(io)
+
+
+
+// Middlewares
+app.use(cors(CorsConfig))
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
@@ -29,6 +40,9 @@ import FriendRouter from './routes/friend.route'
 import SwaggerConfig from './utils/swagger'
 import { serve, setup } from 'swagger-ui-express'
 
+
+
+//Endpoints
 
 app.use('/api-docs',serve,setup(SwaggerConfig))
 app.use('/auth',AuthRouter)

@@ -6,7 +6,7 @@ const SmallButtonModel = {
     danger: 'bg-rose-500 hover:bg-rose-600 rounded text-sm font-medium text-white px-3 py-1.5',
     warning: 'bg-amber-500 hover:bg-amber-600 rounded text-sm font-medium text-white px-3 py-1.5',
     dark: 'bg-zinc-500 hover:bg-zinc-600 rounded text-sm font-medium text-white px-3 py-1.5',
-    success: 'bg-green-400 hover:bg-green-500 rounded text-sm font-medium text-white px-3 py-1.5',
+    success: 'bg-green-500 hover:bg-green-600 rounded text-sm font-medium text-white px-3 py-1.5',
     info: 'bg-cyan-500 hover:bg-cyan-600 rounded text-sm font-medium text-white px-3 py-1.5'
   }
   

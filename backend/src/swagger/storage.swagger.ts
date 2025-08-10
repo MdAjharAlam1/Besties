@@ -3,6 +3,7 @@ const StorageApiDoc = {
         post:{
 
             summary:"Generate signed url for download",
+            description:"Auth Token required",
             requestBody:{
                 required:true,
                 content:{
@@ -77,6 +78,7 @@ const StorageApiDoc = {
     "/storage/upload":{
         post:{
             summary:"Generate signed url for download",
+            description:"Auth Token required",
             requestBody:{
                 required:true,
                 content:{

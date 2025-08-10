@@ -1,5 +1,6 @@
 import AuthApiDocs from "../swagger/auth.swagger"
 import StorageApiDoc from "../swagger/storage.swagger"
+import FriendApiDoc from "../swagger/friend.swagger"
 
 const SwaggerConfig = {
     openapi:'3.0.0',
@@ -17,7 +18,9 @@ const SwaggerConfig = {
     ],
     paths:{
         ...AuthApiDocs,
-        ...StorageApiDoc
+        ...StorageApiDoc,
+        ...FriendApiDoc
+
     }
 }
 

@@ -13,7 +13,9 @@ export const addFriend = async(req:SessionInterface, res:Response)=>{
         const friend = await FriendModel.create(req.body)
         // console.log(req.body, 'ajhar')
         // console.log(friend)
-        res.json({friend})
+        res.json({
+            message:"Friend Request Sent"
+        })
 
     } catch (err:unknown) {
         CatchError(err,res,'Failed to send friend request')

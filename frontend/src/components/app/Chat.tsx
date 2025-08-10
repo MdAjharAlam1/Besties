@@ -1,12 +1,28 @@
 import Avatar from "../shared/Avatar"
 import Button from "../shared/Button"
 import Input from "../shared/Input"
+import socket from "../../lib/Socket"
+import { useEffect } from "react"
+import SmallButton from "../shared/SmallButton"
 
 
 const Chat = () => {
+    
+    useEffect(()=>{
+        socket.on('message', (msg)=>{
+            console.log(msg)
+        })
+    },[])
+
+    const sendMessage = () =>{
+        socket.emit('message', "Hello Ajhar")
+    }
+
   return (
     <div>
-        <div className="h-[500px] overflow-auto space-y-12">
+    <SmallButton onClick={sendMessage}>Test</SmallButton>
+        
+        {/* <div className="h-[500px] overflow-auto space-y-12">
             {
                 Array(20).fill(0).map((index)=>{
                     return <div className="space-y-12" key={index}>
@@ -44,7 +60,7 @@ const Chat = () => {
                     <i className="ri-attachment-2"></i>
                 </button>
             </div>
-        </div>
+        </div> */}
     </div>
   )
 }

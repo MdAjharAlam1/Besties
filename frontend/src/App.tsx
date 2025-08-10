@@ -7,7 +7,6 @@ import Login from "./components/Login"
 import Signup from "./components/Signup"
 import Layout from "./components/app/Layout"
 import Dashboard from "./components/app/Dashboard"
-import Friends from "./components/app/Friends"
 import Video from "./components/app/Video"
 import Audio from "./components/app/Audio";
 import Chat from "./components/app/Chat";
@@ -18,6 +17,7 @@ import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import AuthGaurd from "./gaurds/AuthGaurd";
 import RedirectGaurd from "./gaurds/RedirectGaurd";
+import FriendList from "./components/app/friend/FriendList";
 
 const App = () => {
   const[session,setSession] = useState(null)
@@ -26,14 +26,12 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home/>}/>
-          <Route element = {<RedirectGaurd/>}>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/signup" element={<Signup/>}/>
-          </Route>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/signup" element={<Signup/>}/>
           <Route element = {<AuthGaurd/>}>
             <Route path="/app" element={<Layout/>}>
               <Route path="dashboard" element={<Dashboard/>}/>
-              <Route path="friends" element={<Friends/>}/>
+              <Route path="friends" element={<FriendList/>}/>
               <Route path="my-posts" element={<Post/>}/>
               <Route path="video-chat" element={<Video/>}/>
               <Route path="audio-chat" element={<Audio/>}/>

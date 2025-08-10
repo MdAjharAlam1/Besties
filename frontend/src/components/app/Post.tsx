@@ -23,7 +23,7 @@ const Post = () => {
                 </div>
               </div>
               <Divider/>
-              <div className="space-x-4">
+              <div className="space-x-4 lg:space-y-0 space-y-3">
                 <Button type="info" icon="thumb-up-line">20K</Button>
                 <Button type="warning" icon="thumb-down-line">20K</Button>
                 <Button type="danger" icon="chat-ai-line">20K</Button>

@@ -9,21 +9,26 @@ import useSWR, { mutate } from 'swr'
 import Fetcher from "../../lib/Fetcher"
 import{v4 as uuid} from 'uuid'
 import CatchError from "../../lib/CatchError"
-import SuggestedFriend from "./SuggestedFriend"
-import FriendRequest from "./FriendRequest"
+import FriendSuggestion from "./friend/FriendSuggestion"
+import FriendRequest from "./friend/FriendRequest"
+import FriendList from "./friend/FriendList"
+import { useMediaQuery } from 'react-responsive'
+import Logo from "../shared/Logo"
+import IconButton from "../shared/IconButton"
+import FriendOnline from "./friend/FriendOnline"
+
 
 const EightMinutesInMs = (8*60)*1000
 
 const Layout = () => {
-
     const navigate = useNavigate()
-
-    const[leftAsideSize,setLeftAsideSize] = useState(350)
+    const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+    const[leftAsideSize,setLeftAsideSize] = useState(0)
     const rightAsideSize = 450
-    const collapseSize = 140
+    const [collapseSize, setCollapseSize] = useState(0)
     const sectionDimention = {
-        width :`calc(100% - ${leftAsideSize + rightAsideSize}px)`,
-        marginLeft: leftAsideSize
+        width : isMobile ? "100%" :`calc(100% - ${leftAsideSize + rightAsideSize}px)`,
+        marginLeft: isMobile ? 0: leftAsideSize
     }
     const {pathname} = useLocation()
     const{error} = useSWR('/auth/refresh-token',Fetcher ,{
@@ -33,7 +38,14 @@ const Layout = () => {
 
     const{session,setSession} = useContext(Context)
 
-    
+    const friendUiBlackLists = [
+        "/app/friends",
+        "/app/chat",
+        "/app/audio-chat",
+        "/app/video-chat"
+    ]
+
+    const isBlackListed = friendUiBlackLists.some((path)=> pathname === path)
 
     const Menu = [
         {
@@ -66,6 +78,11 @@ const Layout = () => {
         }
     }
     
+    useEffect(()=>{
+        setLeftAsideSize(isMobile ? 0: 350)
+        setCollapseSize(isMobile ? 0 : 140 )
+    },[isMobile])
+
     useEffect(()=>{
         if(error){
             logout()
@@ -131,8 +148,20 @@ const Layout = () => {
     // }
   return (
     <div className="min-h-screen">
-        <aside className="bg-white h-full fixed top-0 left-0 p-8 overflow-auto" style={{width:leftAsideSize,transition:"0.3s"}}>
-            <div className="space-y-8 bg-gradient-to-br from-indigo-900 via-purple-800 to-blue-900 rounded-2xl h-full p-8">
+
+        <nav className="lg:hidden flex z-[2000] items-center justify-between bg-gradient-to-br from-indigo-900 via-purple-800 to-blue-900 sticky top-0 left-0 w-full py-4 px-6 ">
+            <Logo/>
+            <div className="flex items-center gap-4">
+                <IconButton onClick={logout} icon="logout-circle-line" type="success"/>
+                <Link to="/app/friends">
+                    <IconButton icon="chat-ai-line" type="danger"/>
+                </Link>
+                <IconButton onClick={()=>setLeftAsideSize(leftAsideSize === 300 ? collapseSize : 300)} icon="menu-3-line" type="warning"/>
+            </div>
+        </nav>
+
+        <aside className="bg-white h-full fixed top-0 left-0 lg:p-8 overflow-auto z-[230000]" style={{width:leftAsideSize,transition:"0.3s"}}>
+            <div className="space-y-8 bg-gradient-to-br from-indigo-900 via-purple-800 to-blue-900 lg:rounded-2xl h-full p-8">
                 {
                     leftAsideSize === collapseSize ?
                     <i className="ri-user-fill text-white text-xl animate__animated animate__fadeIn"></i>
@@ -168,11 +197,15 @@ const Layout = () => {
                 </div>
             </div>
         </aside>
-        <section className="py-8 px-1 rounded-2xl" style={{width:sectionDimention.width, marginLeft:sectionDimention.marginLeft}}>
-
+        <section className="lg:py-8 lg:px-1 p-5 space-y-12 rounded-2xl" style={{width:sectionDimention.width, marginLeft:sectionDimention.marginLeft}}>
+            
+            {
+                !isBlackListed &&
+                <FriendRequest/>
+            }
             <Card title={
-                    <div className="flex items-center gap-5">
-                        <button className="w-8 h-8 rounded-full bg-gray-100 hover:bg-slate-200" onClick={()=>setLeftAsideSize(leftAsideSize === 350 ? collapseSize : 350)}>
+                <div className="flex items-center gap-5">
+                        <button className=" lg:block hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-slate-200" onClick={()=>setLeftAsideSize(leftAsideSize === 350 ? collapseSize : 350)}>
                             <i className="ri-arrow-left-line"></i>
                         </button>
                         <h1>{getPathname(pathname)}</h1>
@@ -188,60 +221,35 @@ const Layout = () => {
                 }
                
             </Card>
+            {
+                !isBlackListed &&
+                <FriendSuggestion/>
+            }
         </section>
-        <aside className="bg-white h-full fixed top-0 right-0 py-8 px-8 overflow-auto space-y-8" style={{width:rightAsideSize}}>
-            <SuggestedFriend/>
-            <FriendRequest/>
-            <div className="h-[52%] overflow-auto">
-                <Card
-                    title="Friends" 
-                    divider
-                >
-                    <div className="space-y-4">
-                        {
-                            Array(20).fill(1).map((index)=>{
-                                return  <div key={index} className="bg-gray-100 p-3 rounded-2xl flex ite justify-between items-start">
-                                            <Avatar  
-                                                size="md"
-            
-                                                title="Md Ajhar Alam"    
-                                                subtitle={
-                                                    <small className="text-green-400 font-medium">Online</small>
-                                                }
-                                                subtitleColor="#000"
-                                                image="https://th.bing.com/th/id/OIP.aw2_9W3UMRsvRuSqSJlE1QHaHa?pid=ImgDet&w=195&h=195&c=7&dpr=1.4"
-                                            />
+        <aside 
+            className="lg:block hidden bg-white h-full fixed top-0 right-0 py-8 px-8 overflow-auto space-y-8" 
+            style={{
+                width:rightAsideSize,
+                transition:'0.2s'
+            }}>
+            {/* <div className="overflow-auto">
+                {
+                    !isBlackListed &&
+                    <Card
+                        title="Friends" 
+                        divider
+                    >
+                        <FriendList columns={2} gap={6}/>
+                    </Card> 
+                }
 
-                                            <div className="space-x-3">
-                                                <Link to="/app/chat">
-                                                    <button className="text-blue-500 hover:text-blue-600" title="Chat">
-                                                        <i className="ri-chat-ai-line"></i>
-                                                    </button>
-                                                </Link>
-                                                <Link to="/app/audio-chat">
-                                                    <button className="text-green-500 hover:text-blue-600" title="Audio">
-                                                        <i className="ri-phone-line"></i>
-                                                    </button>
-                                                </Link>
-                                                <Link to="/app/video-chat">
-                                                    <button className="text-amber-500 hover:text-blue-600" title="Video">
-                                                        <i className="ri-video-on-ai-line"></i>
-                                                    </button>
-                                                </Link>
-
-                                            </div>
-
-                                        </div> 
-
-                                    
-                            })  
-                        }
-                    </div>
-                </Card> 
-
-            </div>
+            </div> */}
+            <FriendOnline/>
         </aside>
+
     </div>
+
+
   )
 }
 

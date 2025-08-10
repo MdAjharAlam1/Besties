@@ -14,14 +14,14 @@ const Avatar : FC<AvatarInterface> = ({onClick,size="lg",title,subtitle="subtitl
     <div className="flex items-center gap-3">
       {
         image && 
-        <img onClick={onClick} className={`${size === "lg" ? "w-14 h-14" : "w-8 h-8"} rounded-full object-cover`} src={image} alt="profile Img" />
+        <img onClick={onClick} className={`${size === "lg" ? "w-14 h-14" : "w-8 h-8"} rounded-full object-center`} src={image} alt="profile Img" />
 
       }
       {
         (title && subtitle) &&
         <div className="flex flex-col gap-2">
           <h1 className={`${size === "lg" ? "text-lg/6" : "text-sm"} font-medium capitalize`} style={{color:titleColor}}>{title}</h1>
-          <div style={{color:subtitleColor}}>
+          <div  style={{color:subtitleColor}}>
             {subtitle}
           </div>
         </div>

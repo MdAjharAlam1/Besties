@@ -11,7 +11,7 @@ import{v4 as uuid} from 'uuid'
 import CatchError from "../../lib/CatchError"
 import FriendSuggestion from "./friend/FriendSuggestion"
 import FriendRequest from "./friend/FriendRequest"
-import FriendList from "./friend/FriendList"
+// import FriendList from "./friend/FriendList"
 import { useMediaQuery } from 'react-responsive'
 import Logo from "../shared/Logo"
 import IconButton from "../shared/IconButton"
@@ -24,17 +24,16 @@ const Layout = () => {
     const navigate = useNavigate()
     const isMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const[leftAsideSize,setLeftAsideSize] = useState(0)
-    const rightAsideSize = 450
     const [collapseSize, setCollapseSize] = useState(0)
     const sectionDimention = {
-        width : isMobile ? "100%" :`calc(100% - ${leftAsideSize + rightAsideSize}px)`,
+        width : isMobile ? "100%" :`calc(100% - ${leftAsideSize}px)`,
         marginLeft: isMobile ? 0: leftAsideSize
     }
     const {pathname} = useLocation()
-    const{error} = useSWR('/auth/refresh-token',Fetcher ,{
-        refreshInterval : EightMinutesInMs,
-        shouldRetryOnError : false
-    })
+    // const{error} = useSWR('/auth/refresh-token',Fetcher ,{
+    //     refreshInterval : EightMinutesInMs,
+    //     shouldRetryOnError : false
+    // })
 
     const{session,setSession} = useContext(Context)
 
@@ -83,11 +82,11 @@ const Layout = () => {
         setCollapseSize(isMobile ? 0 : 140 )
     },[isMobile])
 
-    useEffect(()=>{
-        if(error){
-            logout()
-        }
-    },[error])
+    // useEffect(()=>{
+    //     if(error){
+    //         logout()
+    //     }
+    // },[error])
 
     const getPathname = (path:string) =>{
         const firstPath = path.split('/').pop()
@@ -121,14 +120,15 @@ const Layout = () => {
                 const {data} = await HttpInterceptor.post('/storage/upload', payload)
                 await HttpInterceptor.put(data.url , file , options)
                 const {data:user} = await HttpInterceptor.put('/auth/profile-picture',{path})
-                // console.log(user)
-                setSession({...session, image: user.image})
+                console.log(user,"ajhar")
+                setSession((prevSession:any) => ({ ...prevSession, image: user.image }))
                 mutate('/auth/refresh-token')
             } catch (err) {
                 console.log(err)
             }
+            
         }
-    
+        console.log(session)
     }
 
     // const download = async() =>{
@@ -167,7 +167,8 @@ const Layout = () => {
                     <i className="ri-user-fill text-white text-xl animate__animated animate__fadeIn"></i>
                     :
                     <div className="animate__animated animate__fadeIn">
-                        {
+                        {   
+                            
                             session &&
                             <Avatar
                                 titleColor="#ffd"
@@ -197,55 +198,45 @@ const Layout = () => {
                 </div>
             </div>
         </aside>
-        <section className="lg:py-8 lg:px-1 p-5 space-y-12 rounded-2xl" style={{width:sectionDimention.width, marginLeft:sectionDimention.marginLeft}}>
+        <section 
+            className="lg:py-8 lg:px-1  flex  flex-col p-6 lg:flex-row  gap-8" 
+            style={{
+                width:sectionDimention.width, marginLeft:sectionDimention.marginLeft
+            }}
+        >
             
-            {
+            {/* {
                 !isBlackListed &&
                 <FriendRequest/>
-            }
-            <Card title={
-                <div className="flex items-center gap-5">
-                        <button className=" lg:block hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-slate-200" onClick={()=>setLeftAsideSize(leftAsideSize === 350 ? collapseSize : 350)}>
-                            <i className="ri-arrow-left-line"></i>
-                        </button>
-                        <h1>{getPathname(pathname)}</h1>
-                    </div>
-                } 
-                divider
-            >  
-                {
-                    pathname === "/app" ?
-                    <Dashboard/>
-                    :
-                    <Outlet/>
-                }
-               
-            </Card>
-            {
-                !isBlackListed &&
-                <FriendSuggestion/>
-            }
+            } */}
+            <div className="lg:w-[450px] lg:pr-6 lg:order-2 order-1">
+                <aside 
+                    className="bg-white"
+                >
+                    <FriendOnline/>
+                </aside>
+            </div>
+            <div className="flex-1 lg:order-1 order-2">
+                <Card title={
+                    <div className="flex items-center gap-5">
+                            <button className=" lg:block hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-slate-200" onClick={()=>setLeftAsideSize(leftAsideSize === 350 ? collapseSize : 350)}>
+                                <i className="ri-arrow-left-line"></i>
+                            </button>
+                            <h1>{getPathname(pathname)}</h1>
+                        </div>
+                    } 
+                    divider
+                >  
+                    {
+                        pathname === "/app" ?
+                        <Dashboard/>
+                        :
+                        <Outlet/>
+                    }
+                
+                </Card>
+            </div>
         </section>
-        <aside 
-            className="lg:block hidden bg-white h-full fixed top-0 right-0 py-8 px-8 overflow-auto space-y-8" 
-            style={{
-                width:rightAsideSize,
-                transition:'0.2s'
-            }}>
-            {/* <div className="overflow-auto">
-                {
-                    !isBlackListed &&
-                    <Card
-                        title="Friends" 
-                        divider
-                    >
-                        <FriendList columns={2} gap={6}/>
-                    </Card> 
-                }
-
-            </div> */}
-            <FriendOnline/>
-        </aside>
 
     </div>
 

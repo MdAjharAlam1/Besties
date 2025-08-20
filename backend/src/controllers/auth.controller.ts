@@ -7,12 +7,11 @@ import moment from "moment";
 
 import { CatchError, TryError } from "../utils/error";
 import { PayloadInterface, SessionInterface } from "../middlewares/auth.middleware";
-import { downloadObject } from "../utils/S3";
 
 
-const accessTokenExpires = '10m'
+const accessTokenExpires = '7d'
 
-const accessTokenExpiresInTenMinutes = (10 *60)*1000
+const accessTokenExpiresInTenMinutes = (7*24*60*60)*1000
 const refreshTokenExpiresInSevenDays = (7*24*60*60) * 1000
 
 type TokenType = "at" | "rt"
